@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>เทียบราคา ซื้ออะไรคุ้มกว่า</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f0; --card:#ffffff; --ink:#1d2320; --mute:#6b736e; --line:#dcdcd3;
+  --win:#0f7a4d; --win-bg:#e3f3ea; --warn:#a8570f; --warn-bg:#fbeedd; --focus:#0b57d0;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --card:#1b211e; --ink:#eef1ee; --mute:#98a39c; --line:#2f3833;
+    --win:#4ed79a; --win-bg:#16382a; --warn:#f0a85c; --warn-bg:#3a2a14; --focus:#8ab4f8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --card:#1b211e; --ink:#eef1ee; --mute:#98a39c; --line:#2f3833;
+  --win:#4ed79a; --win-bg:#16382a; --warn:#f0a85c; --warn-bg:#3a2a14; --focus:#8ab4f8;
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:960px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+h1{font-size:1.5rem;line-height:1.25;margin:0;font-weight:700}
+.sub{color:var(--mute);font-size:.9rem;margin:4px 0 0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.ghost{background:none;border:1px solid var(--line);border-radius:10px;padding:8px 12px;min-height:40px;color:var(--mute)}
+.ghost:hover{color:var(--ink)}
+
+.summary{border-radius:14px;padding:14px 16px;margin-bottom:16px;background:var(--card);border:1px solid var(--line)}
+.summary.ok{background:var(--win-bg);border-color:transparent}
+.summary.bad{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.summary b{font-weight:700}
+.summary .big{font-size:1.15rem;font-weight:600}
+.summary .small{font-size:.9rem;color:var(--mute);margin-top:2px}
+.summary.ok .small{color:var(--ink);opacity:.8}
+
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr);gap:16px}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(3,1fr)}}
+
+.item{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,background .2s}
+.item.win{border-color:var(--win)}
+.top{display:flex;align-items:center;gap:10px}
+.tag{flex:none;width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700}
+.item.win .tag{background:var(--win);color:#fff}
+.del{flex:none;width:40px;height:40px;border:0;background:none;border-radius:10px;color:var(--mute);font-size:1.3rem;line-height:1}
+.del:hover:not(:disabled){background:var(--bg);color:var(--ink)}
+.del:disabled{opacity:.3;cursor:not-allowed}
+
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grow{flex:1}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f label{font-size:.82rem;color:var(--mute)}
+input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:46px;width:100%}
+input[type=number]{-moz-appearance:textfield}
+.pre{position:relative}
+.pre span{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--mute);pointer-events:none}
+.pre input{padding-left:28px}
+
+.res{border-top:1px solid var(--line);padding-top:10px;min-height:76px;display:flex;flex-direction:column;gap:6px}
+.unit{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.unit .n{font-size:1.6rem;font-weight:700;line-height:1.1}
+.unit .u{color:var(--mute);font-size:.9rem}
+.badge{align-self:flex-start;font-size:.85rem;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--bg);color:var(--mute)}
+.badge.win{background:var(--win-bg);color:var(--win)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.idle{color:var(--mute);font-size:.9rem}
+
+.add{margin-top:16px;width:100%;min-height:56px;border:2px dashed var(--line);border-radius:16px;background:none;font-weight:600;font-size:1.05rem;color:var(--mute)}
+.add:hover:not(:disabled){border-color:var(--ink);color:var(--ink)}
+.add:disabled{opacity:.4;cursor:not-allowed}
+.hint{color:var(--mute);font-size:.85rem;margin-top:16px;text-align:center}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>เทียบราคา ซื้ออะไรคุ้มกว่า</h1>
+      <p class="sub">ใส่ราคาและขนาด ดูทันทีว่าอันไหนคุ้มกว่า</p>
+    </div>
+    <button class="ghost" id="reset" type="button">ล้างค่า</button>
+  </header>
+
+  <div class="summary" id="summary" aria-live="polite"></div>
+  <div class="grid" id="grid"></div>
+  <button class="add" id="add" type="button">+ เพิ่มตัวเลือก</button>
+  <p class="hint">ใส่ขนาดเป็นหน่วยเดียวกันทุกตัวเลือก เช่น g ทั้งหมด หรือ ml ทั้งหมด</p>
+</div>
+
+<script>
+(function(){
+  var KEY="price-compare-v2", MAX=12, MIN=2;
+  var items=[], seq=0;
+
+  function blank(){return {id:++seq,price:"",size:""};}
+  function load(){
+    try{
+      var s=localStorage.getItem(KEY);
+      if(s){var d=JSON.parse(s); if(Array.isArray(d)&&d.length>=MIN){items=d;seq=d.reduce(function(m,x){return Math.max(m,x.id||0)},0);return;}}
+    }catch(e){}
+    items=[blank(),blank()];
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(items));}catch(e){}}
+
+  var grid=document.getElementById("grid"), summary=document.getElementById("summary"),
+      addBtn=document.getElementById("add");
+
+  function letter(i){return String.fromCharCode(65+i);}
+  function fmt(v){
+    var d=v>=1?2:(v>=0.01?3:5);
+    return v.toLocaleString("th-TH",{minimumFractionDigits:d,maximumFractionDigits:d});
+  }
+  function calc(it){
+    var p=parseFloat(it.price), s=parseFloat(it.size);
+    if(!(p>0)||!(s>0))return null;
+    return p/s;
+  }
+
+  function build(){
+    grid.innerHTML="";
+    items.forEach(function(it,i){
+      var el=document.createElement("div");
+      el.className="item"; el.dataset.id=it.id;
+      el.innerHTML=
+        '<div class="top"><span class="tag">'+letter(i)+'</span><span class="grow"></span>'+
+        '<button class="del" type="button" aria-label="ลบตัวเลือก '+letter(i)+'"'+(items.length<=MIN?" disabled":"")+'>×</button></div>'+
+        '<div class="fields">'+
+        '<div class="f"><label>ราคา</label><div class="pre"><span>฿</span><input data-k="price" type="number" inputmode="decimal" min="0" step="any" placeholder="0" enterkeyhint="next"></div></div>'+
+        '<div class="f"><label>ขนาด</label><input data-k="size" type="number" inputmode="decimal" min="0" step="any" placeholder="0" enterkeyhint="next"></div>'+
+        '</div><div class="res"></div>';
+      el.querySelector('[data-k="price"]').value=it.price;
+      el.querySelector('[data-k="size"]').value=it.size;
+      grid.appendChild(el);
+    });
+    addBtn.disabled=items.length>=MAX;
+    update();
+  }
+
+  function update(){
+    var calcs=items.map(calc), ok=[], min=Infinity, max=0;
+    calcs.forEach(function(v,i){if(v!==null){ok.push({i:i,v:v}); if(v<min)min=v; if(v>max)max=v;}});
+    var tie=ok.length>1&&Math.abs(max-min)<=min*1e-9;
+    var cards=grid.children;
+
+    items.forEach(function(it,i){
+      var el=cards[i], res=el.querySelector(".res"), v=calcs[i], html="", win=false;
+      if(v===null){
+        html='<span class="idle">กรอกราคาและขนาด</span>';
+      }else{
+        html='<div class="unit"><span class="n">฿'+fmt(v)+'</span><span class="u">ต่อ 1 หน่วย</span></div>';
+        if(ok.length<2){html+='<span class="badge">รอตัวเลือกอื่นมาเทียบ</span>';}
+        else if(tie){html+='<span class="badge">ราคาเท่ากัน</span>';}
+        else if(Math.abs(v-min)<=min*1e-9){win=true;html+='<span class="badge win">ถูกที่สุด</span>';}
+        else{html+='<span class="badge warn">แพงกว่า '+((v-min)/min*100).toFixed(0)+'%</span>';}
+      }
+      res.innerHTML=html;
+      el.classList.toggle("win",win);
+    });
+
+    summary.className="summary";
+    if(ok.length<2){
+      summary.innerHTML='<div class="big">กรอกอย่างน้อย 2 ตัวเลือกเพื่อเริ่มเทียบ</div>';
+    }else if(tie){
+      summary.innerHTML='<div class="big">ราคาต่อหน่วยเท่ากันทุกตัวเลือก</div>';
+    }else{
+      var wins=ok.filter(function(o){return Math.abs(o.v-min)<=min*1e-9;}).map(function(o){return letter(o.i);});
+      summary.className="summary ok";
+      summary.innerHTML='<div class="big">ซื้อ '+wins.join(" หรือ ")+' คุ้มที่สุด</div>'+
+        '<div class="small">ถูกกว่าตัวแพงสุด '+((max-min)/max*100).toFixed(0)+'%</div>';
+    }
+  }
+
+  grid.addEventListener("input",function(e){
+    var k=e.target.dataset.k; if(!k)return;
+    var id=+e.target.closest(".item").dataset.id;
+    var it=items.filter(function(x){return x.id===id;})[0];
+    it[k]=e.target.value; save(); update();
+  });
+  grid.addEventListener("keydown",function(e){
+    if(e.key!=="Enter")return;
+    var inputs=Array.prototype.slice.call(grid.querySelectorAll("input"));
+    var n=inputs[inputs.indexOf(e.target)+1];
+    if(n){e.preventDefault();n.focus();}
+  });
+  grid.addEventListener("click",function(e){
+    var b=e.target.closest(".del"); if(!b||b.disabled)return;
+    var id=+b.closest(".item").dataset.id;
+    items=items.filter(function(x){return x.id!==id;}); save(); build();
+  });
+  addBtn.addEventListener("click",function(){
+    if(items.length>=MAX)return;
+    items.push(blank()); save(); build();
+    var last=grid.lastElementChild; if(last){last.querySelector('[data-k="price"]').focus();}
+  });
+  document.getElementById("reset").addEventListener("click",function(){
+    items=[blank(),blank()]; save(); build();
+  });
+
+  load(); build();
+})();
+</script>
+</body>
+</html>
